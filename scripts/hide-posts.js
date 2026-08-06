@@ -1,12 +1,24 @@
 var hiddenPosts = [];
 
-hexo.on('generateBefore', function () {
+// 必须在 render_post 过滤器（priority=10）之后执行，否则 locals 中的 Post
+// 仍是未渲染 content 的旧 Document 实例（warehouse.save 会替换实例），
+// 导致生成页面时 post.content 为空。故使用 priority=20 的 before_generate 过滤器。
+hexo.extend.filter.register('before_generate', function () {
   hiddenPosts = [];
 
-  var posts = hexo.locals.get('posts');
+  // 直接从 DB 查询全部文章，避免 locals.get('posts') 在 source.process()
+  // 完成后仍返回不完整结果的缓存问题。
+  var Post = hexo.model('Post');
+  var query = {};
+  if (!hexo.config.future) {
+    query.date = { $lte: Date.now() };
+  }
+  if (!hexo._showDrafts()) {
+    query.published = true;
+  }
+  var posts = Post.find(query);
   if (!posts || !posts.length) return;
 
-  // 从 locals 的 posts Query 过滤，避免 Post.toArray() 拿到旧快照
   hiddenPosts = posts.filter(function (p) {
     return p.hidden;
   }).toArray();
@@ -36,7 +48,7 @@ hexo.on('generateBefore', function () {
 
     hexo.locals.set(key, Model.find({ _id: { $in: visibleIds } }));
   });
-});
+}, 20);
 
 // 为隐藏文章生成详情页（直接 URL 可访问）
 hexo.extend.generator.register('hidden-post-page', function () {
