@@ -6,8 +6,7 @@
     "build": "hexo generate",
     "clean": "hexo clean",
     "deploy": "hexo deploy",
-    "server": "hexo server",
-    "postinstall": "node scripts/copy-theme.js"
+    "server": "hexo server"
   },
   "hexo": {
     "version": "8.1.2"
@@ -22,7 +21,6 @@
     "hexo-renderer-ejs": "^2.0.0",
     "hexo-renderer-marked": "^7.0.0",
     "hexo-renderer-stylus": "^3.0.1",
-    "hexo-server": "^3.0.0",
-    "hexo-theme-landscape": "^1.0.0"
+    "hexo-server": "^3.0.0"
   }
 }
