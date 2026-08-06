@@ -3,24 +3,22 @@ var hiddenPosts = [];
 hexo.on('generateBefore', function () {
   hiddenPosts = [];
 
-  var Post = hexo.model('Post');
-  if (!Post || !Post.length) return;
+  var posts = hexo.locals.get('posts');
+  if (!posts || !posts.length) return;
 
-  var all = Post.toArray();
-  var visible = [];
+  // 从 locals 的 posts Query 过滤，避免 Post.toArray() 拿到旧快照
+  hiddenPosts = posts.filter(function (p) {
+    return p.hidden;
+  }).toArray();
 
-  all.forEach(function (p) {
-    if (p.hidden) {
-      hiddenPosts.push(p);
-    } else {
-      visible.push(p);
-    }
+  var visible = posts.filter(function (p) {
+    return !p.hidden;
   });
 
   hexo.log.info('[hide-posts] 隐藏 %d 篇，可见 %d 篇', hiddenPosts.length, visible.length);
 
-  // 替换全局 posts，只含可见文章
-  hexo.locals.set('posts', new Post.Query(visible));
+  // 替换全局 posts，只含可见文章（visible 已是 Query，无需包装）
+  hexo.locals.set('posts', visible);
 
   // 过滤标签和分类：只保留至少有一篇可见文章的
   ['tags', 'categories'].forEach(function (key) {
