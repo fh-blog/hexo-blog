@@ -1,5 +1,5 @@
 ---
-title: Vue3中computed/watch/watchEffect的区别
+title: Vue3中computed/watch的区别
 date: 2026-08-10
 updated: 2026-08-10
 tags:
