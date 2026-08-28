@@ -7,3 +7,7 @@ themes/landscape/
 public/
 .deploy*/
 _multiconfig.yml
+
+# IDE
+.idea/
+*.iml
